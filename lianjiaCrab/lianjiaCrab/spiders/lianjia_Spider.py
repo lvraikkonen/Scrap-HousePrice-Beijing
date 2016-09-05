@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
-from scrapy.spiders import CrawlSpider, Rule
+from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from lianjiaCrab.items import SoldHouseItem, HouseItem
 
 
-class LianjiaSpider(scrapy.Spider):
+class LianjiaSpider(CrawlSpider):
     name = "lianjia"
     allowed_domains = ["lianjia.com"]
-    start_urls = ['http://bj.lianjia.com/ershoufang/101100443520.html',
-                  'http://bj.lianjia.com/chengjiao/101092349373.html']
+    start_urls = [
+        'http://bj.lianjia.com/ershoufang']
+    #'http://bj.lianjia.com/chengjiao']
     rules = [
         Rule(LinkExtractor(
             allow='ershoufang/[0-9]*\.html',), callback='parse_one_house_info',
             follow=True),
         Rule(LinkExtractor(allow='ershoufang',), follow=True),
         Rule(LinkExtractor(allow='chengjiao/[a-zA-Z0-9]*/',),
-             callback='parse_pg_chengjiao_house_info', follow=True)
-        # Rule(LinkExtractor(allow='chengjiao/[a-zA-Z0-9]*\.html',),
-        #      callback='parse_chengjiao_house_info', follow=True),
-        # Rule(LinkExtractor(allow='chengjiao',), follow=True)
+             callback='parse_pg_chengjiao_house_info', follow=True),
+        Rule(LinkExtractor(allow='chengjiao/[a-zA-Z0-9]*\.html',),
+             callback='parse_chengjiao_house_info', follow=True),
+        Rule(LinkExtractor(allow='chengjiao',), follow=True)
     ]
 
     def parse_pg_chengjiao_house_info(self, response):
@@ -47,8 +48,8 @@ class LianjiaSpider(scrapy.Spider):
 
         return items
 
-#    def parse_one_house_info(self, response):
-    def parse(self, response):
+    def parse_one_house_info(self, response):
+        # def parse(self, response):
         def deal_item(item):
             new_item = HouseItem()
             for key, value in item.items():
